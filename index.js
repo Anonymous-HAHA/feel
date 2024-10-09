@@ -19,6 +19,8 @@ const getTodaysQuote = require('./router/quote/getDailyQuote');
 const editTodaysQuote = require('./router/quote/editDailyQuote');
 const getName = require('./router/user/getName');
 const addName = require('./router/user/addName');
+const getPoems = require('./router/poem/getPoems');
+const addPoem = require('./router/poem/addPoem');
 
 // cors
 app.use(cors({
@@ -37,8 +39,8 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Set a timeout for the server (in milliseconds)
 const TIMEOUT = 300000; // 5 minutes (300,000 milliseconds)
-const server = app.listen(process.env.PORT || 8800, () => {
-    console.log(`Server is running on port ${PORT}`);
+const server = app.listen(8800, () => {
+    console.log(`Server is running`);
 });
 
 // Increase timeout
@@ -57,6 +59,8 @@ app.use('/get/todaysquote', isValidUser, getTodaysQuote);
 app.use('/edit/todaysquote', isAdmin, editTodaysQuote);
 app.use('/get/name', isValidUser, getName);
 app.use('/add/name', isAdmin, addName);
+app.use('/get/poems', isValidUser, getPoems);
+app.use('/add/poem', isAdmin, addPoem);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
