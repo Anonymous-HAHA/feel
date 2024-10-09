@@ -25,11 +25,11 @@ app.use(cors({
     origin: '*'
 }));
 
-app.use(cors({
-    origin: 'https://frontend-mauve-tau.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
-}));
+// app.use(cors({
+//     origin: 'https://frontend-mauve-tau.vercel.app',
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type'],
+// }));
 
 // parsers
 app.use(bodyParser.json());
