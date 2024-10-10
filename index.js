@@ -22,6 +22,9 @@ const addName = require('./router/user/addName');
 const getPoems = require('./router/poem/getPoems');
 const addPoem = require('./router/poem/addPoem');
 const changePassword = require('./router/user/changePassword');
+const addSound = require('./router/sound/addSound');
+const getSounds = require('./router/sound/getSounds');
+const deleteSound = require('./router/sound/deleteSound');
 
 // cors
 app.use(cors({
@@ -63,6 +66,9 @@ app.use('/add/name', isAdmin, addName);
 app.use('/get/poems', isValidUser, getPoems);
 app.use('/add/poem', isAdmin, addPoem);
 app.use('/change/password', isValidUser, changePassword);
+app.use('/add/sound', isAdmin, addSound);
+app.use('/get/sounds', isValidUser, getSounds);
+app.use('/delete/sound', isAdmin, deleteSound);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
