@@ -1,7 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { ref, uploadBytes} = require("firebase/storage");
-const storage = require("../../modules/firebase");
+const admin = require("../../modules/firebase"); // Assuming you've updated this to use admin
 const Sounds = require("../../models/sound");
 
 const router = express.Router();
@@ -32,24 +31,34 @@ const upload = multer({
 router.post("/", upload.single("soundFile"), async (req, res) => {
   try {
     const { title } = req.body;
-    if(!title){
-        return res.status(400).json({ error: "Title is required" });
-        }
-    if (!req.file ) {
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+    if (!req.file) {
       return res.status(400).json({ error: "No file uploaded or file type not supported" });
     }
 
     const file = req.file;
     const uniqueName = `${Date.now()}_${file.originalname}`; // Generate unique name
-    const storageRef = ref(storage, `sounds/${uniqueName}`);
 
+    // Create a reference to the Firebase Storage bucket
+    const bucket = admin.storage().bucket();
 
-    await uploadBytes(storageRef, file.buffer);
+    // Create a file object for the upload
+    const fileUpload = bucket.file(`sounds/${uniqueName}`);
+
+    // Upload the file buffer to Firebase Storage
+    await fileUpload.save(file.buffer, {
+      contentType: file.mimetype,
+      metadata: {
+        firebaseStorageDownloadTokens: uniqueName, // Create a unique token for file access
+      },
+    });
 
     // Save the unique name in MongoDB
-    const sound = new Sounds({ 
-        title,
-      sound: uniqueName 
+    const sound = new Sounds({
+      title,
+      sound: uniqueName,
     });
     await sound.save();
 

@@ -1,25 +1,24 @@
 const express = require("express");
-const { ref, deleteObject } = require("firebase/storage");
-const storage = require("../../modules/firebase"); // Your Firebase storage module
+const admin = require("../../modules/firebase"); // Your Firebase admin module
 const Sounds = require("../../models/sound"); // Import your Sounds model
 
 const router = express.Router();
-
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Find the sound record in MongoDB
     const sound = await Sounds.findById(id);
     if (!sound) {
       return res.status(404).json({ error: "Sound not found" });
     }
 
     // Create a reference to the file in Firebase Storage
-    const fileRef = ref(storage, `sounds/${sound.sound}`);
+    const fileRef = admin.storage().bucket().file(`sounds/${sound.sound}`);
 
     // Delete the file from Firebase Storage
-    await deleteObject(fileRef);
+    await fileRef.delete();
 
     // Remove the record from MongoDB
     await Sounds.findByIdAndDelete(id);

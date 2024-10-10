@@ -1,25 +1,33 @@
-// firebaseConfig.js
+const fs = require('fs');
+const crypto = require('crypto-js');
 // const dotenv = require('dotenv');
-// dotenv.config(); 
-const { initializeApp } =require("firebase/app");
-const { getStorage } = require("firebase/storage");
+const admin = require("firebase-admin");
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: process.env.API_KEY,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    appId: process.env.APP_ID,
-    messagingSenderId: process.env.SENDER_ID,
-    measurementId: process.env.MEASUREMENT_ID,
-    authDomain: process.env.AUTH_DOMAIN,
+// Load environment variables
+// dotenv.config();
 
-  };
+// Read the encrypted content from secret.txt
+const encryptedContent = fs.readFileSync('secret.txt', 'utf8');
 
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-// console.log(firebaseApp);
+// Decrypt the content using the secret key from environment variables
+const bytes = crypto.AES.decrypt(encryptedContent, process.env.FIREBASE_SECRET_KEY);
+const decrypted = bytes.toString(crypto.enc.Utf8);
 
-const storage = getStorage(firebaseApp);
+// Parse the decrypted JSON content
+let serviceAccountJson;
+try {
+    serviceAccountJson = JSON.parse(decrypted);
+    // console.log('Parsed JSON Object:', serviceAccountJson);
+} catch (error) {
+    console.error('Error parsing JSON:', error);
+}
 
-module.exports=  storage ;
+// Initialize Firebase Admin SDK using the decrypted service account credentials
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccountJson),
+    storageBucket: process.env.STORAGE_BUCKET
+});
+
+// You can use admin.storage() to interact with Firebase Storage
+
+module.exports = admin;
