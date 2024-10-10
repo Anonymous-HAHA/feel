@@ -1,5 +1,5 @@
 const Users = require('../models/user');
-
+const CryptoJS = require('crypto-js');
 
 class User {
   constructor(username) {
@@ -36,6 +36,30 @@ class User {
     } catch (error) {
       console.error(`Error adding name`, error);
       throw new Error(`Could not add name`);
+    }
+  }
+  async changePassword(oldPassword, newPassword) {
+    try {
+      
+      const user = await Users.findOne({ username: this.username });
+      if (!user) {
+        throw new Error(`User not found`);
+      }
+      const decryptedPassword = CryptoJS.AES.decrypt(
+        user.password,
+        process.env.SECRET_KEY
+      ).toString(CryptoJS.enc.Utf8);
+      if (oldPassword === decryptedPassword) {
+        user.password = CryptoJS.AES.encrypt(newPassword, process.env.SECRET_KEY).toString(); 
+        await user.save();
+        return user;
+      }
+      throw new Error(`Old password is incorrect`);
+   
+      
+    } catch (error) {
+      console.error(`Error adding name`, error);
+      throw new Error(`Could not change password ${error}`);
     }
   }
 
