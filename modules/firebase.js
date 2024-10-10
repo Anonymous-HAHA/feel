@@ -1,4 +1,3 @@
-const fs = require('fs');
 const crypto = require('crypto-js');
 // const dotenv = require('dotenv');
 const admin = require("firebase-admin");
@@ -8,7 +7,7 @@ const admin = require("firebase-admin");
 
 // Read the encrypted content from secret.txt
 
-const encryptedContent = fs.readFileSync('../secret.txt', 'utf8');
+const encryptedContent = process.env.SECRET_TEXT;
 
 // Decrypt the content using the secret key from environment variables
 const bytes = crypto.AES.decrypt(encryptedContent, process.env.FIREBASE_SECRET_KEY);
