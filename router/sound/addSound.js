@@ -1,9 +1,13 @@
 const express = require("express");
 const multer = require("multer");
-const admin = require("../../modules/firebase"); // Assuming you've updated this to use admin
+const ffmpeg = require("fluent-ffmpeg");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const admin = require("../../modules/firebase");
 const Sounds = require("../../models/sound");
 
 const router = express.Router();
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 const storageConfig = multer.memoryStorage();
 const upload = multer({
@@ -20,11 +24,7 @@ const upload = multer({
       'audio/x-ms-wma'
     ];
     const isValid = allowedTypes.includes(file.mimetype);
-    if (isValid) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type. Only audio files are allowed."));
-    }
+    cb(null, isValid);
   },
 });
 
@@ -38,34 +38,38 @@ router.post("/", upload.single("soundFile"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded or file type not supported" });
     }
 
-    const file = req.file;
-    const uniqueName = `${Date.now()}_${file.originalname}`; // Generate unique name
+    const uniqueName = `${Date.now()}_${req.file.originalname}`;
 
-    // Create a reference to the Firebase Storage bucket
-    const bucket = admin.storage().bucket();
+    // Convert to MP3
+    ffmpeg()
+      .input(req.file.buffer)
+      .toFormat("mp3")
+      .on("error", (err) => {
+        console.error("Error converting file:", err);
+        res.status(500).json({ error: "Error converting file", details: err.message });
+      })
+      .on("end", async () => {
+        const bucket = admin.storage().bucket();
+        const fileUpload = bucket.file(`sounds/${uniqueName}`);
 
-    // Create a file object for the upload
-    const fileUpload = bucket.file(`sounds/${uniqueName}`);
+        // Upload converted file
+        await fileUpload.save(convertedFile, {
+          contentType: "audio/mpeg",
+          metadata: {
+            firebaseStorageDownloadTokens: uniqueName,
+          },
+        });
 
-    // Upload the file buffer to Firebase Storage
-    await fileUpload.save(file.buffer, {
-      contentType: file.mimetype,
-      metadata: {
-        firebaseStorageDownloadTokens: uniqueName, // Create a unique token for file access
-      },
-    });
+        const sound = new Sounds({ title, sound: uniqueName });
+        await sound.save();
 
-    // Save the unique name in MongoDB
-    const sound = new Sounds({
-      title,
-      sound: uniqueName,
-    });
-    await sound.save();
+        res.status(200).json({ message: "File uploaded successfully", uniqueName });
+      })
+      .pipe();
 
-    res.status(200).json({ message: "File uploaded successfully", uniqueName });
   } catch (error) {
-    console.error("Error uploading file:", error);
-    res.status(500).json({ error: "Failed to upload file", details: error.message });
+    console.error("Error processing file:", error);
+    res.status(500).json({ error: "Failed to process file", details: error.message });
   }
 });
 
