@@ -31,10 +31,11 @@ router.get("/download/:id", async (req, res) => {
 
     const fileRef = admin.storage().bucket().file(`sounds/${sound.sound}`);
     const fileStream = fileRef.createReadStream();
+    const sanitizedFileName = encodeURIComponent(sound.title);
 
     res.set({
       "Content-Type": "audio/mpeg", // Set the content type accordingly
-      "Content-Disposition": `attachment; filename="${sound.title}"`, // Prompt for download
+      "Content-Disposition": `attachment; filename="${sanitizedFileName}"`, // Prompt for download
     });
 
     // Pipe the file stream to the response
