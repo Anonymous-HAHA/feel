@@ -26,6 +26,10 @@ const addSound = require('./router/sound/addSound');
 const getSounds = require('./router/sound/getSounds');
 const deleteSound = require('./router/sound/deleteSound');
 const changeTitle = require('./router/sound/changeTitle');
+const uploadDrawing = require('./router/drawing/uploadDrawing');
+const getDrawings = require('./router/drawing/getDrawings');
+const deleteDrawing = require('./router/drawing/deleteDrawing');
+
 
 // cors
 app.use(cors({
@@ -71,6 +75,9 @@ app.use('/add/sound', isAdmin, addSound);
 app.use('/get/sounds', isValidUser, getSounds);
 app.use('/delete/sound', isAdmin, deleteSound);
 app.use('/change/sound/title', isValidUser, changeTitle);
+app.use('/upload/drawing', isAdmin, uploadDrawing);
+app.use('/get/drawings', isValidUser, getDrawings);
+app.use('/delete/drawing', isAdmin, deleteDrawing);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
