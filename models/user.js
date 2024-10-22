@@ -19,6 +19,10 @@ const userSchema = new Schema({
     type: String,
     // default: "",
   },
+  fcmToken: {
+    type: String, // Add this line to store the FCM token
+    default: null,
+  },
 });
 
 const Users = mongoose.model("User", userSchema);
