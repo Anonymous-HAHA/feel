@@ -6,6 +6,10 @@ const router = express.Router();
 router.post('/', async (req, res) => {
     // const username = req.username;
     const { username , title, message } = req.body;
+
+    if (!username || !title || !message) {
+      return res.status(400).json({ message: 'Username, title, and message are required' });
+    }
   
     try {
       const user = await User.findOne({ username });
