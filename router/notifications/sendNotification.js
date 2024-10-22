@@ -4,8 +4,8 @@ const User = require('../../models/user'); // Your User model
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-    const username = req.username;
-    const { title, message } = req.body;
+    // const username = req.username;
+    const { username , title, message } = req.body;
   
     try {
       const user = await User.findOne({ username });
