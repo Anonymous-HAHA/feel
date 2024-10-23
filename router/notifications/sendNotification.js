@@ -19,15 +19,15 @@ router.post('/', async (req, res) => {
 
     // Correct payload structure
     const payload = {
+      to: user.fcmToken,
       notification: {
         title: title,
         body: message,
-        // The icon is not here; it should be in the data payload
+        icon: 'https://frontend-ten-pi-46.vercel.app/deep.jpeg', // Icon for the notification
+        click_action: 'https://frontend-ten-pi-46.vercel.app', // Optional click action
       },
       data: {
-        icon: 'https://frontend-ten-pi-46.vercel.app/deep.jpeg', // Use data payload for icon
       },
-      token: user.fcmToken,
     };
 
     const response = await admin.messaging().send(payload);
