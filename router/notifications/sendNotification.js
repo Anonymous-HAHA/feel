@@ -22,10 +22,12 @@ router.post('/', async (req, res) => {
       notification: {
         title: title,
         body: message,
-        icon: 'https://frontend-ten-pi-46.vercel.app/deep.jpeg', // Icon for the notification
-        click_action: 'https://your-app-url.com', // Optional click action
       },
-      // Specify the token directly
+      webpush: {
+      fcm_options: {
+        link: "https://frontend-ten-pi-46.vercel.app"
+      },
+    },
       token: user.fcmToken, // Ensure this is set to the user's FCM token
     };
 
