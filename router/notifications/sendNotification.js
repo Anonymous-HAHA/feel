@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
       notification: {
         title: title,
         body: message,
+        badge: "https://frontend-ten-pi-46.vercel.app/deep.jpeg", 
       },
       webpush: {
       fcm_options: {
