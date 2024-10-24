@@ -23,11 +23,11 @@ router.post('/', async (req, res) => {
         title: title,
         body: message,
       },
-      webpush: {
-      fcm_options: {
-        link: "https://frontend-ten-pi-46.vercel.app"
-      },
-    },
+    //   webpush: {
+    //   fcm_options: {
+    //     link: "https://frontend-ten-pi-46.vercel.app"
+    //   },
+    // },
       token: user.fcmToken, // Ensure this is set to the user's FCM token
     };
 
