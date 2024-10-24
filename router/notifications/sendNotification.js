@@ -28,11 +28,6 @@ router.post('/', async (req, res) => {
         link: "https://frontend-ten-pi-46.vercel.app"
       },
     },
-    android: {
-    notification: {
-      icon: 'https://frontend-ten-pi-46.vercel.app/deep.jpeg',
-    }
-  },
       token: user.fcmToken, // Ensure this is set to the user's FCM token
     };
 
